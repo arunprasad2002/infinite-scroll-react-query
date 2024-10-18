@@ -24,6 +24,7 @@ interface SearchableDropdownProps {
   query: string
   setQuery: Dispatch<SetStateAction<string>>
   setCountryId: Dispatch<SetStateAction<string>>
+  hasNextPage: boolean
 }
 
 const SearchableDropdown = forwardRef<HTMLDivElement, SearchableDropdownProps>(
@@ -38,6 +39,7 @@ const SearchableDropdown = forwardRef<HTMLDivElement, SearchableDropdownProps>(
       query,
       setQuery,
       setCountryId,
+      hasNextPage,
     },
     ref
   ) => {
@@ -51,7 +53,7 @@ const SearchableDropdown = forwardRef<HTMLDivElement, SearchableDropdownProps>(
     })
 
     useEffect(() => {
-      if (inView) {
+      if (inView && hasNextPage) {
         fetchNextPage() // Fetch the next page when the last option comes into view
       }
     }, [inView, fetchNextPage])

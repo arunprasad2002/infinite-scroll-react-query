@@ -12,7 +12,7 @@ import { useEffect, useState } from "react"
 const Home = () => {
   const [query, setQuery] = useState<string>("")
   const {
-    infiniteQueries: { data, fetchNextPage },
+    infiniteQueries: { data, fetchNextPage, hasNextPage },
   } = userCountries({ search: query })
 
   const [countryName, setContryName] = useState("")
@@ -40,6 +40,7 @@ const Home = () => {
     <div>
       <p>Country API</p>
       <SearchableDropdown
+        hasNextPage={hasNextPage}
         options={options || []}
         label="name"
         id="id"

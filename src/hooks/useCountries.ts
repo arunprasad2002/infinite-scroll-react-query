@@ -14,7 +14,12 @@ const userCountries = ({ search }: { search: string }) => {
     queryFn: ({ pageParam }) => fetchCoutries(pageParam, search),
     initialPageParam: 0,
     getNextPageParam: (lastPage, allPages) => {
-      return allPages.length * 20
+      const totalItem = lastPage?.result?.count
+      const allItems = allPages?.length * 20
+      if (allItems >= totalItem) {
+        return undefined
+      }
+      return allPages?.length * 20
     },
   })
   return {
