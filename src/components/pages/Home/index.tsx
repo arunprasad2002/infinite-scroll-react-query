@@ -3,16 +3,23 @@
  */
 "use client"
 
+import { useInView } from "react-intersection-observer"
+
 import SearchableDropdown from "@/components/common/dropdown/searchableDropDown"
 import userCountries from "@/hooks/useCountries"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 const Home = () => {
   const {
-    infiniteQueries: { data },
+    infiniteQueries: { data, fetchNextPage },
   } = userCountries()
 
-  const [value, setValue] = useState("Select option...")
+  const [value, setValue] = useState("")
+  const { ref, inView, entry } = useInView()
+
+  useEffect(() => {
+    console.log({ inView })
+  }, [inView])
 
   const options = data?.pages
     ?.map((page) => {
@@ -36,6 +43,8 @@ const Home = () => {
         id="id"
         selectedVal={value}
         handleChange={(val) => setValue(val || "")}
+        ref={ref}
+        fetchNextPage={fetchNextPage}
       />
     </div>
   )

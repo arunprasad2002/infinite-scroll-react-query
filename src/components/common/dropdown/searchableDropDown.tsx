@@ -1,4 +1,12 @@
-import { useEffect, useRef, useState, ChangeEvent, MouseEvent } from "react"
+import React, {
+  useEffect,
+  useRef,
+  useState,
+  ChangeEvent,
+  MouseEvent,
+  forwardRef,
+} from "react"
+import { useInView } from "react-intersection-observer"
 
 interface Option {
   [key: string]: any // Use a more specific type based on your option structure if possible
@@ -10,87 +18,102 @@ interface SearchableDropdownProps {
   id: string
   selectedVal: string | null // Assuming selectedVal can be a string or null
   handleChange: (value: string | null) => void // handleChange should accept a string or null
+  fetchNextPage: () => void // Function to fetch the next page of options
 }
 
-const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
-  options,
-  label,
-  id,
-  selectedVal,
-  handleChange,
-}) => {
-  const [query, setQuery] = useState<string>("")
-  const [isOpen, setIsOpen] = useState<boolean>(false)
+const SearchableDropdown = forwardRef<HTMLDivElement, SearchableDropdownProps>(
+  ({ options, label, id, selectedVal, handleChange, fetchNextPage }, ref) => {
+    const [query, setQuery] = useState<string>("")
+    const [isOpen, setIsOpen] = useState<boolean>(false)
+    const inputRef = useRef<HTMLInputElement | null>(null)
 
-  const inputRef = useRef<HTMLInputElement | null>(null)
+    // Use useInView to track the last option
+    const { ref: lastOptionRef, inView } = useInView({
+      threshold: 1.0, // Adjust this based on your needs
+      triggerOnce: false,
+    })
 
-  useEffect(() => {
-    // @ts-ignore
-    document.addEventListener("click", toggle)
-    return () => {
+    useEffect(() => {
+      if (inView) {
+        fetchNextPage() // Fetch the next page when the last option comes into view
+      }
+    }, [inView, fetchNextPage])
+
+    useEffect(() => {
+      const toggle = (e: MouseEvent) => {
+        setIsOpen(e.target === inputRef.current)
+      }
       // @ts-ignore
-      document.removeEventListener("click", toggle)
+      document.addEventListener("click", toggle)
+      return () => {
+        // @ts-ignore
+        document.removeEventListener("click", toggle)
+      }
+    }, [])
+
+    const selectOption = (option: Option) => {
+      setQuery("")
+      handleChange(option[label])
+      setIsOpen(false)
     }
-  }, [])
 
-  const selectOption = (option: Option) => {
-    setQuery("")
-    handleChange(option[label])
-    setIsOpen((prevIsOpen) => !prevIsOpen)
-  }
+    const getDisplayValue = () => {
+      if (query) return query
+      if (selectedVal) return selectedVal
+      return ""
+    }
 
-  const toggle = (e: MouseEvent) => {
-    setIsOpen(e.target === inputRef.current)
-  }
+    const filter = (options: Option[]) => {
+      return options.filter((option) =>
+        option[label].toLowerCase().includes(query.toLowerCase())
+      )
+    }
 
-  const getDisplayValue = () => {
-    if (query) return query
-    if (selectedVal) return selectedVal
-    return ""
-  }
+    const filteredOptions = filter(options)
 
-  const filter = (options: Option[]) => {
-    return options.filter((option) =>
-      option[label].toLowerCase().includes(query.toLowerCase())
+    return (
+      <div className="dropdown" ref={ref}>
+        <div className="control">
+          <div className="selected-value">
+            <input
+              ref={inputRef}
+              type="text"
+              value={getDisplayValue()}
+              name="searchTerm"
+              onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                setQuery(e.target.value)
+                handleChange(null)
+              }}
+              onClick={() => setIsOpen((prev) => !prev)} // Toggle dropdown
+              placeholder="Select Country"
+            />
+          </div>
+          <div className={`arrow ${isOpen ? "open" : ""}`}></div>
+        </div>
+
+        <div className={`options ${isOpen ? "open" : ""}`}>
+          {filteredOptions.map((option, index) => {
+            // Attach the inView ref to the last option
+            const isLastOption = index === filteredOptions.length - 1
+            const optionRef = isLastOption ? lastOptionRef : null
+
+            return (
+              <div
+                ref={optionRef} // Attach the ref to the last option
+                onClick={() => selectOption(option)}
+                className={`option ${
+                  option[label] === selectedVal ? "selected" : ""
+                }`}
+                key={`${id}-${index}`}
+              >
+                {option[label]}
+              </div>
+            )
+          })}
+        </div>
+      </div>
     )
   }
-
-  return (
-    <div className="dropdown">
-      <div className="control">
-        <div className="selected-value">
-          <input
-            ref={inputRef}
-            type="text"
-            value={getDisplayValue()}
-            name="searchTerm"
-            onChange={(e: ChangeEvent<HTMLInputElement>) => {
-              setQuery(e.target.value)
-              handleChange(null)
-            }}
-            onClick={toggle}
-          />
-        </div>
-        <div className={`arrow ${isOpen ? "open" : ""}`}></div>
-      </div>
-
-      <div className={`options ${isOpen ? "open" : ""}`}>
-        {filter(options).map((option, index) => {
-          return (
-            <div
-              onClick={() => selectOption(option)}
-              className={`option ${
-                option[label] === selectedVal ? "selected" : ""
-              }`}
-              key={`${id}-${index}`}
-            >
-              {option[label]}
-            </div>
-          )
-        })}
-      </div>
-    </div>
-  )
-}
+)
 
 export default SearchableDropdown
