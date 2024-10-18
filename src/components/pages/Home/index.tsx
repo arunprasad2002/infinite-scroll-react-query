@@ -8,6 +8,7 @@ import { useInView } from "react-intersection-observer"
 import SearchableDropdown from "@/components/common/dropdown/searchableDropDown"
 import userCountries from "@/hooks/useCountries"
 import { useEffect, useState } from "react"
+import SearchAsyncDropDown from "@/components/common/dropdown/searchAsyncDropDown"
 
 const Home = () => {
   const [query, setQuery] = useState<string>("")
@@ -39,7 +40,7 @@ const Home = () => {
   return (
     <div>
       <p>Country API</p>
-      <SearchableDropdown
+      {/* <SearchableDropdown
         hasNextPage={hasNextPage}
         options={options || []}
         label="name"
@@ -51,7 +52,9 @@ const Home = () => {
         query={query}
         setQuery={setQuery}
         setCountryId={setCountryId}
-      />
+      /> */}
+
+      <SearchAsyncDropDown />
     </div>
   )
 }
