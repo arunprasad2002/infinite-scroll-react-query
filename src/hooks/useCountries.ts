@@ -1,17 +1,17 @@
 import { useInfiniteQuery } from "@tanstack/react-query"
 
-const fetchCoutries = async (offset: number) => {
+const fetchCoutries = async (offset: number, search: string) => {
   const res = await fetch(
-    `https://smartb.com.au/api/public/country?limit=20&offset=${offset}`
+    `https://smartb.com.au/api/public/country?limit=20&offset=${offset}&search=${search}`
   )
   const data = await res.json()
   return data
 }
 
-const userCountries = () => {
+const userCountries = ({ search }: { search: string }) => {
   const infiniteQueries = useInfiniteQuery({
-    queryKey: ["countries"],
-    queryFn: ({ pageParam }) => fetchCoutries(pageParam),
+    queryKey: ["countries", search],
+    queryFn: ({ pageParam }) => fetchCoutries(pageParam, search),
     initialPageParam: 0,
     getNextPageParam: (lastPage, allPages) => {
       return allPages.length * 20

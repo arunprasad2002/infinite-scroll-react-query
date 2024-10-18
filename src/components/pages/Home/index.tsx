@@ -10,16 +10,16 @@ import userCountries from "@/hooks/useCountries"
 import { useEffect, useState } from "react"
 
 const Home = () => {
+  const [query, setQuery] = useState<string>("")
   const {
     infiniteQueries: { data, fetchNextPage },
-  } = userCountries()
+  } = userCountries({ search: query })
 
-  const [value, setValue] = useState("")
+  const [countryName, setContryName] = useState("")
+  const [countryId, setCountryId] = useState<string>("")
   const { ref, inView, entry } = useInView()
 
-  useEffect(() => {
-    console.log({ inView })
-  }, [inView])
+  console.log({ countryId })
 
   const options = data?.pages
     ?.map((page) => {
@@ -34,6 +34,8 @@ const Home = () => {
     })
     ?.flat()
 
+  console.log({ query })
+
   return (
     <div>
       <p>Country API</p>
@@ -41,10 +43,13 @@ const Home = () => {
         options={options || []}
         label="name"
         id="id"
-        selectedVal={value}
-        handleChange={(val) => setValue(val || "")}
+        selectedVal={countryName}
+        handleChange={(countryName) => setContryName(countryName || "")}
         ref={ref}
         fetchNextPage={fetchNextPage}
+        query={query}
+        setQuery={setQuery}
+        setCountryId={setCountryId}
       />
     </div>
   )

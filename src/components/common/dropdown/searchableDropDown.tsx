@@ -5,6 +5,8 @@ import React, {
   ChangeEvent,
   MouseEvent,
   forwardRef,
+  Dispatch,
+  SetStateAction,
 } from "react"
 import { useInView } from "react-intersection-observer"
 
@@ -19,11 +21,26 @@ interface SearchableDropdownProps {
   selectedVal: string | null // Assuming selectedVal can be a string or null
   handleChange: (value: string | null) => void // handleChange should accept a string or null
   fetchNextPage: () => void // Function to fetch the next page of options
+  query: string
+  setQuery: Dispatch<SetStateAction<string>>
+  setCountryId: Dispatch<SetStateAction<string>>
 }
 
 const SearchableDropdown = forwardRef<HTMLDivElement, SearchableDropdownProps>(
-  ({ options, label, id, selectedVal, handleChange, fetchNextPage }, ref) => {
-    const [query, setQuery] = useState<string>("")
+  (
+    {
+      options,
+      label,
+      id,
+      selectedVal,
+      handleChange,
+      fetchNextPage,
+      query,
+      setQuery,
+      setCountryId,
+    },
+    ref
+  ) => {
     const [isOpen, setIsOpen] = useState<boolean>(false)
     const inputRef = useRef<HTMLInputElement | null>(null)
 
@@ -54,6 +71,7 @@ const SearchableDropdown = forwardRef<HTMLDivElement, SearchableDropdownProps>(
     const selectOption = (option: Option) => {
       setQuery("")
       handleChange(option[label])
+      setCountryId(option[id])
       setIsOpen(false)
     }
 
