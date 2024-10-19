@@ -40,21 +40,22 @@ const Home = () => {
   return (
     <div>
       <p>Country API</p>
-      {/* <SearchableDropdown
-        hasNextPage={hasNextPage}
-        options={options || []}
-        label="name"
-        id="id"
-        selectedVal={countryName}
-        handleChange={(countryName) => setContryName(countryName || "")}
-        ref={ref}
-        fetchNextPage={fetchNextPage}
-        query={query}
-        setQuery={setQuery}
-        setCountryId={setCountryId}
-      /> */}
-
-      <SearchAsyncDropDown />
+      <div className="flex flex-col space-y-5">
+        <SearchableDropdown
+          hasNextPage={hasNextPage}
+          options={options || []}
+          label="name"
+          id="id"
+          selectedVal={countryName}
+          handleChange={(countryName) => setContryName(countryName || "")}
+          ref={ref}
+          fetchNextPage={fetchNextPage}
+          query={query}
+          setQuery={setQuery}
+          setCountryId={setCountryId}
+        />
+        <SearchAsyncDropDown />
+      </div>
     </div>
   )
 }

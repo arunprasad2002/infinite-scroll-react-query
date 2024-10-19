@@ -16,7 +16,8 @@
     "react": "^18",
     "react-dom": "^18",
     "react-intersection-observer": "^9.13.1",
-    "react-select": "^5.8.1"
+    "react-select": "^5.8.1",
+    "use-debounce": "^10.0.4"
   },
   "devDependencies": {
     "@tanstack/react-query-devtools": "^5.12.1",
